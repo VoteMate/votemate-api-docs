@@ -46,9 +46,9 @@ resources:
     blurb: |
       All the info needed to check registration for a particular state.
 
-      - `state`: The standard two character state code
-      - `url`: The url of the web form
-      - `target`: The POST endpoint the form data is sent to
+      - `state` is the standard two character state code
+      - `url` is the url of the web form
+      - `target` is the POST endpoint the form data is sent to
     spec:
       state: string
       fields:
