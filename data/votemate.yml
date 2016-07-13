@@ -1,28 +1,45 @@
 name: Judicial API
 base_path: https://api.votemate.us/v1
 resources:
-  - name: Election
+  - name: User
     blurb: |
-      The election resource
+      Represents a user of VoteMate
     spec:
-      name: string
-      date: string
-      level: string
-      candidates:
-        - Candidate A
-        - Candidate B
+      email: string
+      state: string
+      precinct: string
+      created_at: datetime
+      updated_at: datetime
     endpoints:
-      - name: List Elections
-        path: /elections
-        verb: GET
-        blurb: Get a list of elections
-        #params:
+      - name: Create or update a user
+        path: /users
+        verb: POST
+        blurb:
+        params:
+          - name: email
+            param_type: formData
+            data_type: string
+            blurb: The user's email
+            required: true
+          - name: state
+            param_type: formData
+            data_type: string
+            blurb: The user's voting state
+            required: true
+          - name: precinct
+            param_type: formData
+            data_type: string
+            blurb: The user's precinct
+            required: false
         responses:
+          - status: 201
+            content_type: json
+            body:
+              status: CREATED
           - status: 200
             content_type: json
             body:
-              - <serialized Election 0>
-              - <serialized Election 1>
+              status: UPDATED
         tags:
           - webapp
   - name: CheckRegistrationForm
