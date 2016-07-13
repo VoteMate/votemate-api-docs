@@ -5,8 +5,7 @@
         i.fa.fa-cube
         = r.name
     .resource-content
-      .resource-blurb
-        p= r.blurb
+      .resource-blurb= as_md(r.blurb)
       .resource-spec
         - if r.spec
           h6
