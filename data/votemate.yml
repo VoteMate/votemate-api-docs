@@ -40,6 +40,10 @@ resources:
             content_type: json
             body:
               status: UPDATED
+          - status: 400
+            content_type: json
+            body:
+              status: USER_NOT_VALID
         tags:
           - webapp
   - name: CheckRegistrationForm
@@ -100,7 +104,7 @@ resources:
           - name: variable
             param_type: formData
             data_type: variable
-            blurb: All the form data
+            blurb: All the form data for that state
         responses:
           - status: 200
             content_type: json
