@@ -7,6 +7,8 @@ require 'kramdown'
 
 config[:api] = "votemate"
 
+activate :relative_assets
+
 # Per-page layout changes:
 #
 # With no layout
