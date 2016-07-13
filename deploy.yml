@@ -1,0 +1,29 @@
+---
+- name: Build static site locally
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    engine: middleman
+  tasks:
+    - name: Build middleman site
+      command: bundle exec middleman build
+      when: engine == "middleman"
+  tags:
+    - build
+
+- name: Copy static site to host
+  hosts: all
+  gather_facts: no
+  vars:
+    name: votemate-api-docs
+    build_dir: build/
+    ansible_ssh_user: ubuntu
+  tasks:
+    - name: Copy build directory
+      copy:
+        src: "{{ build_dir }}"
+        dest: /srv/{{name}}
+      become: yes
+  tags:
+    - copy

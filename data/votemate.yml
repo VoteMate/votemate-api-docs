@@ -1,0 +1,117 @@
+name: Judicial API
+base_path: https://api.votemate.us/v1
+resources:
+  - name: Election
+    blurb: |
+      The election resource
+    spec:
+      name: string
+      date: string
+      level: string
+      candidates:
+        - Candidate A
+        - Candidate B
+    endpoints:
+      - name: List Elections
+        path: /elections
+        verb: GET
+        blurb: Get a list of elections
+        #params:
+        responses:
+          - status: 200
+            content_type: json
+            body:
+              - <serialized Election 0>
+              - <serialized Election 1>
+        tags:
+          - webapp
+  - name: CheckRegistrationForm
+    blurb: |
+      All the info needed to check registration for a particular state.
+
+      - `state`: The standard two character state code
+      - `url`: The url of the web form
+      - `target`: The POST endpoint the form data is sent to
+    spec:
+      state: string
+      fields:
+        - <serialized CheckRegistrationField 0>
+        - <serialized CheckRegistrationField 1>
+      url: string
+      target: string
+    endpoints:
+      - name: List check registration forms
+        path: /check-registration-form
+        verb: GET
+        blurb: Lists all states for which check registration form info can be retrieved
+        responses:
+          - status: 200
+            content_type: json
+            body:
+              - <state 0>
+              - <state 1>
+      - name: Get a state's CheckRegistrationForm
+        path: /check-registration-form/<state>
+        verb: GET
+        blurb: Get check registration form details for a particular state
+        params:
+          - name: state
+            param_type: path
+            data_type: string
+            blurb: The state whose form to look up
+            required: true
+        responses:
+          - status: 200
+            content_type: raw
+            body: <serialized CheckRegistrationForm>
+          - status: 400
+            content_type: raw
+            body: "STATE_NOT_IMPLEMENTED"
+          - status: 400
+            content_type: raw
+            body: "STATE_NOT_VALID"
+      - name: Submit a CheckRegistrationForm
+        path: /check-registration-form/<state>
+        verb: POST
+        blurb: Submit a check registration form for a particular state. POST parameters must include all required fields returned from GET /check-registration-forms/<state>. Returns a list of voter information, which must include a field specifying whether they are registered or not.
+        params:
+          - name: state
+            param_type: path
+            data_type: string
+            blurb: The state whose form to submit
+            required: true
+          - name: variable
+            param_type: formData
+            data_type: variable
+            blurb: All the form data
+        responses:
+          - status: 200
+            content_type: json
+            body:
+              registered: boolean
+          - status: 400
+            content_type: raw
+            body: "INCORRECT_FIELDS"
+          - status: 400
+            content_type: raw
+            body: "STATE_NOT_IMPLEMENTED"
+          - status: 400
+            content_type: raw
+            body: "STATE_NOT_VALID"
+
+  - name: CheckRegistrationField
+    blurb: |
+      Fields that belong to CheckRegistrationForms. Has no dedicated endpoints, but is returned as part of CheckRegistrationForm queries.
+
+      - `label` is the a descriptive label of the field that can be shown to the user
+      - `name` is the name attribute for the web form, which corresponds to keys in the POSTed form data
+      - `type` must be one of `"TEXT"`, `"SELECT"`, `"CHECK"`, `"RADIO"`.
+      - `choices` can be a validation regex if type is `"TEXT"` or a comma delimited list of choices for the other types.
+    spec:
+      id: string
+      label: string
+      name: "string"
+      required: boolean
+      type: string
+      choices: string
+

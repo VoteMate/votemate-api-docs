@@ -4,7 +4,7 @@ require 'slim'
 # Page options, layouts, aliases and proxies
 ###
 
-config[:api] = "sample_api"
+config[:api] = "votemate"
 
 # Per-page layout changes:
 #
