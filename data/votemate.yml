@@ -51,15 +51,15 @@ resources:
       All the info needed to check registration for a particular state.
 
       - `state` is the standard two character state code
-      - `url` is the url of the web form
-      - `target` is the POST endpoint the form data is sent to
+      - `form_url` is the url of the web form
+      - `target_url` is the POST endpoint the form data is sent to
     spec:
       state: string
       fields:
         - <serialized CheckRegistrationField 0>
         - <serialized CheckRegistrationField 1>
-      url: string
-      target: string
+      form_url: string
+      submit_url: string
     endpoints:
       - name: List check registration forms
         path: /check-registration-form
@@ -125,14 +125,17 @@ resources:
       Fields that belong to CheckRegistrationForms. Has no dedicated endpoints, but is returned as part of CheckRegistrationForm queries.
 
       - `label` is the a descriptive label of the field that can be shown to the user
-      - `name` is the name attribute for the web form, which corresponds to keys in the POSTed form data
-      - `type` must be one of `"TEXT"`, `"SELECT"`, `"CHECK"`, `"RADIO"`.
-      - `choices` can be a validation regex if type is `"TEXT"` or a comma delimited list of choices for the other types.
+      - `name_attr` is the name attribute for the web form, which corresponds to keys in the POST form data
+      - `type` must be one of `"TEXT"`, `"SELECT"`, where the former is a text field and the latter is a select dropdown.
+      - `choices` can be a validation regex if type is `"TEXT"` or a comma delimited list of choices in the form `label:value` if the type is `"SELECT"`.
+      - `order` indicates where this field should be within its form, where fields are presented in ascending order.
+      - `width` is an integer from 1-12 representing how many columns the field should occupy in a 12 column grid layout.
     spec:
-      id: string
       label: string
-      name: "string"
+      name_attr: "string"
       required: boolean
       type: string
       choices: string
+      order: int
+      width: int
 
