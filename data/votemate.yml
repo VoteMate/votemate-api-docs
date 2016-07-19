@@ -53,6 +53,8 @@ resources:
       - `state` is the standard two character state code
       - `form_url` is the url of the web form
       - `target_url` is the POST endpoint the form data is sent to
+      - `submit_name_attr` is the name attribute of the submit button
+      - `submit_value_attr` is the value attribute of the submit button
     spec:
       state: string
       fields:
@@ -60,6 +62,8 @@ resources:
         - <serialized CheckRegistrationField 1>
       form_url: string
       submit_url: string
+      submit_name_attr: string
+      submit_value_attr: string
     endpoints:
       - name: List check registration forms
         path: /check-registration-form
@@ -126,8 +130,8 @@ resources:
 
       - `label` is the a descriptive label of the field that can be shown to the user
       - `name_attr` is the name attribute for the web form, which corresponds to keys in the POST form data
-      - `type` must be one of `"TEXT"`, `"SELECT"`, where the former is a text field and the latter is a select dropdown.
-      - `choices` can be a validation regex if type is `"TEXT"` or a comma delimited list of choices in the form `label:value` if the type is `"SELECT"`.
+      - `type` is one of `"TEXT"`, `"SELECT"`, `"CHECK"`, `"HIDDEN"`.
+      - `conf` can be a validation regex if type is `"TEXT"`, or a comma delimited list of choices in the form `label:value` if the type is `"SELECT"`, a description of the checkbox if the type is `"CHECK"`, or the hidden field value if the type is `"HIDDEN"`.
       - `order` indicates where this field should be within its form, where fields are presented in ascending order.
       - `width` is an integer from 1-12 representing how many columns the field should occupy in a 12 column grid layout.
     spec:
@@ -135,7 +139,7 @@ resources:
       name_attr: "string"
       required: boolean
       type: string
-      choices: string
+      conf: string
       order: int
       width: int
 
