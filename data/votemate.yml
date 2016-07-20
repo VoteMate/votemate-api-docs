@@ -52,7 +52,7 @@ resources:
 
       - `state` is the standard two character state code
       - `form_url` is the url of the web form
-      - `target_url` is the POST endpoint the form data is sent to
+      - `submit_url` is the POST endpoint the form data is sent to
       - `submit_name_attr` is the name attribute of the submit button
       - `submit_value_attr` is the value attribute of the submit button
     spec:
