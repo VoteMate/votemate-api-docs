@@ -1,6 +1,129 @@
 name: Judicial API
 base_path: https://api.votemate.us/v1
 resources:
+  - name: CheckRegistrationForm
+    blurb: |
+      All the info needed to check registration for a particular state.
+
+      - `state` is the standard two character state code
+      - `fields` is a list of all the user input fields in the form
+      - `hidden_fields` is a hashtable of name to value for hidden fields automatically parsed from this form.
+      - `form_url` is the url of the web form
+      - `submit_url` is the POST endpoint the form data is sent to
+      - `submit_name_attr` is the name attribute of the submit button
+      - `submit_value_attr` is the value attribute of the submit button
+    spec:
+      state: string
+      fields: Array[serialized CheckRegistrationField]
+      hidden_fields: Hash[hidden_field_name:hidden_field_value]
+      form_url: string
+      submit_url: string
+      submit_name_attr: string
+      submit_value_attr: string
+    endpoints:
+      - name: List check registration forms
+        path: /check-registration-form
+        verb: GET
+        blurb: Lists all state codes for which check registration form info can be retrieved
+        responses:
+          - status: 200
+            content_type: raw
+            body: Array[CheckRegistrationForm.state]
+      - name: Get a state's CheckRegistrationForm
+        path: /check-registration-form/<state>
+        verb: GET
+        blurb: Get check registration form details for a particular state
+        params:
+          - name: state
+            param_type: path
+            data_type: string
+            blurb: The state whose form to look up
+            required: true
+        responses:
+          - status: 200
+            content_type: raw
+            body: <serialized CheckRegistrationForm>
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: parsing error
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: connection error
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: timeout error
+          - status: 404
+            content_type: raw
+            body: Empty (state not found)
+      - name: Submit a CheckRegistrationForm
+        path: /check-registration-form/<state>
+        verb: POST
+        blurb: Submit a check registration form for a particular state. POST parameters must include all required fields returned from GET /check-registration-forms/<state>. Returns a list of voter information, which must include a field specifying whether they are registered or not.
+        params:
+          - name: state
+            param_type: path
+            data_type: string
+            blurb: The state whose form to submit
+            required: true
+          - name: variable
+            param_type: formData
+            data_type: variable
+            blurb: All the form data for that state
+        responses:
+          - status: 200
+            content_type: json
+            body:
+              success: true
+              registered: true
+              ...: ... (depends on state and if registered)
+          - status: 200
+            content_type: json
+            body:
+              success: true
+              registered: false
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: parsing error
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: connection error
+          - status: 200
+            content_type: json
+            body:
+              success: false
+              msg: timeout error
+          - status: 404
+            content_type: raw
+            body: Empty (state not found)
+
+  - name: CheckRegistrationField
+    blurb: |
+      Fields that belong to CheckRegistrationForms. Has no dedicated endpoints, but is returned as part of CheckRegistrationForm queries.
+
+      - `label` is the a descriptive label of the field that can be shown to the user
+      - `name_attr` is the name attribute for the web form, which corresponds to keys in the POST form data
+      - `type` is one of `"TEXT"`, `"SELECT"`, `"CHECK"`, `"HIDDEN"`.
+      - `conf` can be a validation regex if type is `"TEXT"`, or a comma delimited list of choices in the form `label:value` if the type is `"SELECT"`, a description of the checkbox if the type is `"CHECK"`, or the hidden field value if the type is `"HIDDEN"`.
+      - `order` indicates where this field should be within its form, where fields are presented in ascending order.
+      - `width` is an integer from 1-12 representing how many columns the field should occupy in a 12 column grid layout.
+    spec:
+      label: string
+      name_attr: "string"
+      required: boolean
+      type: string
+      conf: string
+      order: int
+      width: int
   - name: User
     blurb: |
       Represents a user of VoteMate
@@ -46,100 +169,3 @@ resources:
               status: USER_NOT_VALID
         tags:
           - webapp
-  - name: CheckRegistrationForm
-    blurb: |
-      All the info needed to check registration for a particular state.
-
-      - `state` is the standard two character state code
-      - `form_url` is the url of the web form
-      - `submit_url` is the POST endpoint the form data is sent to
-      - `submit_name_attr` is the name attribute of the submit button
-      - `submit_value_attr` is the value attribute of the submit button
-    spec:
-      state: string
-      fields:
-        - <serialized CheckRegistrationField 0>
-        - <serialized CheckRegistrationField 1>
-      form_url: string
-      submit_url: string
-      submit_name_attr: string
-      submit_value_attr: string
-    endpoints:
-      - name: List check registration forms
-        path: /check-registration-form
-        verb: GET
-        blurb: Lists all states for which check registration form info can be retrieved
-        responses:
-          - status: 200
-            content_type: json
-            body:
-              - <state 0>
-              - <state 1>
-      - name: Get a state's CheckRegistrationForm
-        path: /check-registration-form/<state>
-        verb: GET
-        blurb: Get check registration form details for a particular state
-        params:
-          - name: state
-            param_type: path
-            data_type: string
-            blurb: The state whose form to look up
-            required: true
-        responses:
-          - status: 200
-            content_type: raw
-            body: <serialized CheckRegistrationForm>
-          - status: 400
-            content_type: raw
-            body: "STATE_NOT_IMPLEMENTED"
-          - status: 400
-            content_type: raw
-            body: "STATE_NOT_VALID"
-      - name: Submit a CheckRegistrationForm
-        path: /check-registration-form/<state>
-        verb: POST
-        blurb: Submit a check registration form for a particular state. POST parameters must include all required fields returned from GET /check-registration-forms/<state>. Returns a list of voter information, which must include a field specifying whether they are registered or not.
-        params:
-          - name: state
-            param_type: path
-            data_type: string
-            blurb: The state whose form to submit
-            required: true
-          - name: variable
-            param_type: formData
-            data_type: variable
-            blurb: All the form data for that state
-        responses:
-          - status: 200
-            content_type: json
-            body:
-              registered: boolean
-          - status: 400
-            content_type: raw
-            body: "INCORRECT_FIELDS"
-          - status: 400
-            content_type: raw
-            body: "STATE_NOT_IMPLEMENTED"
-          - status: 400
-            content_type: raw
-            body: "STATE_NOT_VALID"
-
-  - name: CheckRegistrationField
-    blurb: |
-      Fields that belong to CheckRegistrationForms. Has no dedicated endpoints, but is returned as part of CheckRegistrationForm queries.
-
-      - `label` is the a descriptive label of the field that can be shown to the user
-      - `name_attr` is the name attribute for the web form, which corresponds to keys in the POST form data
-      - `type` is one of `"TEXT"`, `"SELECT"`, `"CHECK"`, `"HIDDEN"`.
-      - `conf` can be a validation regex if type is `"TEXT"`, or a comma delimited list of choices in the form `label:value` if the type is `"SELECT"`, a description of the checkbox if the type is `"CHECK"`, or the hidden field value if the type is `"HIDDEN"`.
-      - `order` indicates where this field should be within its form, where fields are presented in ascending order.
-      - `width` is an integer from 1-12 representing how many columns the field should occupy in a 12 column grid layout.
-    spec:
-      label: string
-      name_attr: "string"
-      required: boolean
-      type: string
-      conf: string
-      order: int
-      width: int
-
